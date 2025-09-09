@@ -1,14 +1,21 @@
 feeds:
-  # Nyheder
+  # Brede DK-nyheder / erhverv
   - https://www.dr.dk/nyheder/service/feeds/allenyheder
-  - https://www.berlingske.dk/rss
-  - https://finans.dk/rss
-  - https://borsen.dk/nyheder/rss
-  # Startup/tech
+  - https://www.berlingske.dk/rss            # (kan have flere underfeeds)
+  - https://finans.dk/rss/                   # (kan kræve login på artikler)
+  - https://borsen.dk/nyheder/rss            # (kan kræve login på artikler)
+  - https://www.version2.dk/feeds/rss
+  - https://www.computerworld.dk/rss/all
+
+  # DK startup/tech-økosystem
   - https://bootstrapping.dk/feed/
   - https://techsavvy.media/feed/
-  - https://techcrunch.com/feed/   # internationalt
-  - https://nordicstartupnews.com/feed/ 
+  # Tilføj gerne flere danske WP-baserede sider: ofte findes RSS på /feed
+
+  # Google News (metafeeds – fanger mange kilder på én gang)
+  - https://news.google.com/rss/search?q=kvindelige%20iv%C3%A6rks%C3%A6ttere%20when:30d&hl=da&gl=DK&ceid=DK:da
+  - https://news.google.com/rss/search?q=kvinder%20startup%20when:30d&hl=da&gl=DK&ceid=DK:da
+  - https://news.google.com/rss/search?q=female%20founders%20Denmark%20when:30d&hl=da&gl=DK&ceid=DK:da
 
 keywords_gender:
   - kvinde
