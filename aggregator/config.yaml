@@ -9,17 +9,14 @@ feeds:
 keywords_gender:
   - kvinde
   - kvinder
-  - kvind(e|elig|elige)
   - female
   - women
-  - kvindeejet(e)?
 
 keywords_startup:
-  - iværksætter(i|e)?
-  - startup(s)?
-  - scaleup(s)?
-  - stifter(e|en)?
-  - founder(s)?
-  - medstifter(e|en)?
+  - iværksætter
+  - startup
+  - stifter
+  - founder
+
 
 export_limit: 200
