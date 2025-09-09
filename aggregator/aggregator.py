@@ -76,9 +76,17 @@ def main():
                 or now_iso()
             )
 
-            hay = f"{title}\n{summary}"
-            if not (kw_gender.search(hay) and kw_startup.search(hay)):
-                continue  # require at least one hit from each group
+          hay = f"{title}\n{summary}"
+
+kw_business = re.compile("(" + "|".join(cfg.get("keywords_business", [])) + ")", re.IGNORECASE)
+has_gender = bool(kw_gender.search(hay))
+has_startup = bool(kw_startup.search(hay))
+has_business = bool(kw_business.search(hay))
+
+# Kræv kvinde-vinkel, og derudover enten startup-ELLER business-ord
+if not (has_gender and (has_startup or has_business)):
+    continue
+
 
             _id = hash_id(link, title)
             if _id in ids:
