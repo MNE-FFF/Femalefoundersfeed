@@ -1,20 +1,27 @@
 #!/usr/bin/env python3
 """
-FemaleFoundersFeed — RSS aggregator (simple, keyword-based)
-- Reads feeds from config.yaml
-- Filters for women + entrepreneurship keywords
-- Writes ./news.json (consumed by index.html)
+FemaleFoundersFeed — RSS aggregator (keyword-baseline)
 
-Run locally:
+- Læser feeds fra aggregator/config.yaml
+- Filtrerer artikler ud fra:
+    * mindst ét "køn"-ord (kvinde/women/female/…)
+    * OG (mindst ét "startup"-ord ELLER mindst ét "business"-ord)
+- Skriver resultater til ./news.json (læses af index.html)
+
+Kør lokalt:
   pip install -r aggregator/requirements.txt
-  python aggregator.py
+  python aggregator/aggregator.py
 
-Notes:
-- Keep to RSS/Atom (respect robots.txt and site terms).
-- This is a simple heuristic baseline. Improve as needed.
+Bemærk:
+- Hold dig til RSS/Atom (respektér robots.txt og vilkår).
+- Dette er en simpel baseline. Udvid senere med bedre NLP/deduplikering efter behov.
 """
 from __future__ import annotations
-import hashlib, json, re, sys
+
+import hashlib
+import json
+import re
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -22,35 +29,52 @@ import feedparser
 from bs4 import BeautifulSoup
 import yaml
 
-ROOT = Path(__file__).resolve().parent.parent  # repo root
+
+# --- Stier ---
+ROOT = Path(__file__).resolve().parent.parent  # repo-roden
 CONFIG_PATH = ROOT / "aggregator" / "config.yaml"
 OUTPUT_PATH = ROOT / "news.json"
 
+
+# --- Hjælpere ---
 def clean_html(html: str) -> str:
     if not html:
         return ""
     soup = BeautifulSoup(html, "html.parser")
     return soup.get_text(" ", strip=True)
 
+
 def now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
-def load_config():
+
+def load_config() -> dict:
     with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
+        return yaml.safe_load(f) or {}
+
 
 def hash_id(link: str, title: str) -> str:
     return hashlib.sha256(f"{link}|{title}".encode("utf-8")).hexdigest()
 
-def main():
+
+# --- Hovedprogram ---
+def main() -> None:
     cfg = load_config()
     feeds = cfg.get("feeds", [])
     if not feeds:
         print("[WARN] No feeds configured in config.yaml", file=sys.stderr)
 
-    # compile regex
-    kw_gender = re.compile("(" + "|".join(cfg["keywords_gender"]) + ")", re.IGNORECASE)
-    kw_startup = re.compile("(" + "|".join(cfg["keywords_startup"]) + ")", re.IGNORECASE)
+    # Kompiler søgeord (robust mod tomme lister)
+    kg = cfg.get("keywords_gender", [])
+    ks = cfg.get("keywords_startup", [])
+    kb = cfg.get("keywords_business", [])
+
+    if not kg or not ks:
+        print("[WARN] Missing keywords_gender or keywords_startup in config.yaml", file=sys.stderr)
+
+    kw_gender = re.compile("(" + "|".join(kg) + ")", re.IGNORECASE) if kg else None
+    kw_startup = re.compile("(" + "|".join(ks) + ")", re.IGNORECASE) if ks else None
+    kw_business = re.compile("(" + "|".join(kb) + ")", re.IGNORECASE) if kb else None
 
     entries = []
     ids = set()
@@ -76,17 +100,15 @@ def main():
                 or now_iso()
             )
 
-          hay = f"{title}\n{summary}"
+            hay = f"{title}\n{summary}"
 
-kw_business = re.compile("(" + "|".join(cfg.get("keywords_business", [])) + ")", re.IGNORECASE)
-has_gender = bool(kw_gender.search(hay))
-has_startup = bool(kw_startup.search(hay))
-has_business = bool(kw_business.search(hay))
+            has_gender = bool(kw_gender.search(hay)) if kw_gender else False
+            has_startup = bool(kw_startup.search(hay)) if kw_startup else False
+            has_business = bool(kw_business.search(hay)) if kw_business else False
 
-# Kræv kvinde-vinkel, og derudover enten startup-ELLER business-ord
-if not (has_gender and (has_startup or has_business)):
-    continue
-
+            # Kræv kvinde-vinkel, og derudover enten startup- ELLER business-ord
+            if not (has_gender and (has_startup or has_business)):
+                continue
 
             _id = hash_id(link, title)
             if _id in ids:
@@ -103,15 +125,17 @@ if not (has_gender and (has_startup or has_business)):
                 "source": source,
             })
 
-    # sort newest first by published if parseable
+    # Sortér nyeste først (tåler ikke-ISO datoer ved fallback)
     def ts(x):
         try:
+            # håndtér 'Z'
             return datetime.fromisoformat(str(x["published"]).replace("Z", "+00:00"))
         except Exception:
-            return datetime(1970,1,1, tzinfo=timezone.utc)
+            return datetime(1970, 1, 1, tzinfo=timezone.utc)
 
     entries.sort(key=ts, reverse=True)
 
+    # Begræns mængde for et let JSON
     limit = int(cfg.get("export_limit", 200))
     entries = entries[:limit]
 
@@ -119,6 +143,7 @@ if not (has_gender and (has_startup or has_business)):
         json.dump(entries, f, ensure_ascii=False, indent=2)
 
     print(f"[OK] Wrote {len(entries)} items to {OUTPUT_PATH}")
+
 
 if __name__ == "__main__":
     main()
