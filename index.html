@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>FemaleFoundersFeed</title>
+  <meta name="description" content="Nyheder om female founders & iværksætteri i Danmark – samlet ét sted.">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <style>
+    :root {
+      --maxw: 1000px;
+      --fg: #111;
+      --muted: #555;
+      --border: #e5e5e5;
+      --bg: #fff;
+      --chip: #f6f6f6;
+      --chip-on: #111;
+      --chip-on-fg: #fff;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; color: var(--fg); background: var(--bg); }
+    .container { max-width: var(--maxw); margin: 0 auto; padding: 0 16px; }
+    header { position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+    .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 10px; }
+    .logo { width: 36px; height: 36px; background: #000; color: #fff; border-radius: 14px; display: grid; place-items: center; font-weight: 800; }
+    h1 { font-size: 20px; margin: 0; }
+    .tagline { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .updated { font-size: 12px; color: var(--muted); }
+    .controls { padding-bottom: 12px; }
+    .search { position: relative; }
+    .search input { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 12px; outline: none; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .chip { font-size: 12px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 999px; background: var(--chip); cursor: pointer; }
+    .chip.on { background: var(--chip-on); color: var(--chip-on-fg); border-color: var(--chip-on); }
+    main { padding: 20px 0 40px; }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+    @media (min-width: 900px) { .grid { grid-template-columns: 1fr 1fr; } }
+    .card { border: 1px solid var(--border); border-radius: 14px; padding: 14px; background: #fff; }
+    .card h3 { margin: 0 0 6px; font-size: 18px; line-height: 1.25; }
+    .meta { font-size: 12px; color: var(--muted); }
+    .summary { font-size: 14px; margin-top: 8px; }
+    .topics { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+    .topic { font-size: 10px; border: 1px solid var(--border); border-radius: 999px; padding: 4px 8px; }
+    .more { margin-left: auto; font-size: 12px; text-decoration: none; }
+    footer { border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+    footer .container { padding: 16px 0 28px; }
+    .empty { color: var(--muted); font-size: 14px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-inner">
+      <div class="brand">
+        <div class="logo">F</div>
+        <div>
+          <h1>FemaleFoundersFeed</h1>
+          <div class="tagline">Nyheder om female founders & iværksætteri i DK – samlet ét sted</div>
+        </div>
+      </div>
+      <div class="updated" id="lastUpdated"></div>
+    </div>
+    <div class="container controls">
+      <div class="search">
+        <input id="q" placeholder="Søg i titler, resumé og kilder…">
+      </div>
+      <div class="chips" id="chips"></div>
+    </div>
+  </header>
+  <main class="container">
+    <div id="loading" class="empty">Indlæser nyheder…</div>
+    <div id="empty" class="empty" style="display:none">Ingen artikler matcher dine filtre endnu.</div>
+    <div id="feed" class="grid" style="display:none"></div>
+  </main>
+  <footer>
+    <div class="container">
+      FemaleFoundersFeed samler offentligt tilgængelige overskrifter og linker videre til kilderne.
+      Vi er ikke ansvarlige for eksternt indhold. Respektér kilders vilkår og rettigheder.
+    </div>
+  </footer>
+  <script src="./app.js"></script>
+</body>
+</html>
