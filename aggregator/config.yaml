@@ -1,39 +1,83 @@
 feeds:
-  # DK brede / tech
+  # ——— DK brede/erhverv/tech ———
   - https://www.dr.dk/nyheder/service/feeds/allenyheder
   - https://www.version2.dk/feeds/rss
   - https://www.computerworld.dk/rss/all
+  - https://www.itwatch.dk/rss/ (if any issues, remove)
+  - https://www.folketingstidende.dk/rss (remove if noisy)
 
-  # DK startup-økosystem
+  # ——— DK startup/økosystem ———
   - https://bootstrapping.dk/feed/
   - https://techsavvy.media/feed/
   - https://nordicstartupnews.com/feed/
+  - https://startupnavigator.eu/feed/  # (DK cases ofte nævnt)
+  - https://techbbq.dk/feed/
 
-  # EU / internationalt (kan have danske historier)
+  # ——— Nordics/EU/international (kan have DK-cases) ———
   - https://www.eu-startups.com/feed/
   - https://siliconcanals.com/news/startups/feed/
+  - https://techcrunch.com/feed/
+
+  # ——— Offentlige/organisationer (ofte WordPress) ———
+  - https://ivaerksaetterdanmark.dk/feed/
+  - https://www.erhvervshus.dk/feed/
+  - https://ehhs.dk/feed/              # Erhvervshus Hovedstaden
+  - https://ehmidtjylland.dk/feed/     # Erhvervshus Midtjylland
+  - https://ehfyn.dk/feed/             # Erhvervshus Fyn (hvis WP)
+  - https://vaekstfonden.dk/feed/      # (hvis WP; fjern hvis 404)
+  - https://digitalhubdenmark.dk/feed/ # fjern hvis 404
+
+  # ——— Universiteter/inkubatorer ———
+  - https://cse.cbs.dk/feed/           # CBS CSE
+  - https://startup.ku.dk/feed/        # KU (hvis WP)
+  - https://www.dtu.dk/english/-/rss   # DTU (fjern hvis støj)
+  - https://www.au.dk/nyheder.rss      # AU (fjern hvis støj)
+
+  # ——— Events/aktører ———
+  - https://girlsonfilm.dk/feed/       # eksempel (fjern hvis off-topic)
+  - https://inklusionogdiversitet.dk/feed/ # fjern hvis off-topic
+  - https://digital-tech-summit.dk/feed/   # fjern hvis 404
+
+  # ——— Google News metafeeds (meget effektive) ———
+  - "https://news.google.com/rss/search?q=kvindelige%20iv%C3%A6rks%C3%A6ttere%20when:90d&hl=da&gl=DK&ceid=DK:da"
+  - "https://news.google.com/rss/search?q=kvinder%20startup%20Danmark%20when:90d&hl=da&gl=DK&ceid=DK:da"
+  - "https://news.google.com/rss/search?q=female%20founders%20Denmark%20when:90d&hl=en&gl=DK&ceid=DK:en"
+  - "https://news.google.com/rss/search?q=kvindelig%20stifter%20virksomhed%20when:90d&hl=da&gl=DK&ceid=DK:da"
+  - "https://news.google.com/rss/search?q=kvindeejet%20virksomhed%20when:90d&hl=da&gl=DK&ceid=DK:da"
+  - "https://news.google.com/rss/search?q=rollemodeller%20iv%C3%A6rks%C3%A6tteri%20when:90d&hl=da&gl=DK&ceid=DK:da"
+
 
 
 keywords_gender:
   - kvinde
   - kvinder
   - kvindelig
+  - kvindelige
   - female
   - women
   - woman
-  - hun
+  - kvindeejet
+  - women-owned
+  - female-led
+  - women-led
 
 keywords_startup:
   - iværksætter
+  - iværksætteri
   - startup
   - scaleup
-  - founder
   - stifter
   - medstifter
-  - entreprenør
-  - erhverv
-  - virksomhed
-  - erhvervsleder
+  - founder
+  - co-founder
+  - accelerator
+  - inkubator
+  - pitch
+  - venture
+  - seed
+  - funding
+  - pre-seed
+  - serie a
 
 keywords_business:
   - erhverv
