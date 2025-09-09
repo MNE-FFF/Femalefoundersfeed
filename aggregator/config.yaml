@@ -3,8 +3,11 @@ feeds:
   - https://www.dr.dk/nyheder/service/feeds/allenyheder
   - https://www.version2.dk/feeds/rss
   - https://www.computerworld.dk/rss/all
-  - https://www.itwatch.dk/rss/ (if any issues, remove)
-  - https://www.folketingstidende.dk/rss (remove if noisy)
+  - https://jyllands-posten.dk/rss
+  - https://www.business.dk/rss
+  - https://www.altinget.dk/rss/all
+  - https://www.erhvervsplus.dk/rss
+
 
   # ——— DK startup/økosystem ———
   - https://bootstrapping.dk/feed/
@@ -46,6 +49,14 @@ feeds:
   - "https://news.google.com/rss/search?q=kvindeejet%20virksomhed%20when:90d&hl=da&gl=DK&ceid=DK:da"
   - "https://news.google.com/rss/search?q=rollemodeller%20iv%C3%A6rks%C3%A6tteri%20when:90d&hl=da&gl=DK&ceid=DK:da"
 
+  # ——— Nye kilder om kvinder & iværksætteri ———
+  - https://kvinfo.dk/feed/
+  - https://kvinfo.dk/publikationer/feed/
+  - https://kvindeokonomien.dk/feed/
+  - https://www.female-leadership-academy.com/news/feed/
+  - https://www.technordicadvocates.org/news/feed/
+  - https://www.evenfounders.com/blogs/overview/feed/
+  - https://nordicfemalefounders.dk/presse/pressemeddelelser/feed/
 
 
 keywords_gender:
