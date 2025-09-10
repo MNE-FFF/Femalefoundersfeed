@@ -106,4 +106,4 @@ weights:
   title_bonus: 1
 
 min_score: 3
-export_limit: 300
+export_limit: 200
