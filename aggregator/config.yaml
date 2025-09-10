@@ -91,4 +91,19 @@ keywords_business:
   - opkøb
   - eksport
 
-export_limit: 200
+exclude_keywords:
+  - superliga
+  - fodbold
+  - håndbold
+  - cykling
+  - koncert
+  - celebrity
+
+weights:
+  gender: 2
+  startup: 2
+  business: 1
+  title_bonus: 1
+
+min_score: 3
+export_limit: 300
