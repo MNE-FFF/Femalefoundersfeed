@@ -103,7 +103,10 @@ function renderFeed(){
     const a = document.createElement("a"); a.href = it.link; a.target="_blank"; a.rel="noopener"; a.textContent = it.title; h3.appendChild(a);
     const meta = document.createElement("div"); meta.className = "meta";
     meta.textContent = `${it.source || "Kilde"}${it.published ? " · " + fmtDate(it.published) : ""}`;
-    const sum = document.createElement("p"); sum.className="summary"; sum.textContent = it.summary || "";
+    const sum = document.createElement("p"); sum.className = "summary";
+    const MAX_CHARS = 180; // vælg længde
+    let text = it.summary || "";
+    if (text.length > MAX_CHARS) {text = text.substring(0, MAX_CHARS).trim() + "…";}sum.textContent = text;
     const topics = document.createElement("div"); topics.className="topics";
     guessTopics(it).forEach((t) => { const tag=document.createElement("span"); tag.className="topic"; tag.textContent=t; topics.appendChild(tag); });
     card.appendChild(h3); card.appendChild(meta); if (it.summary) card.appendChild(sum); card.appendChild(topics);
