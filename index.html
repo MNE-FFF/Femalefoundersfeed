@@ -1,164 +1,128 @@
-<!DOCTYPE html>
-<html lang="da">
+<!doctype html>
+<html lang="da" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Female Founders Feed</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FemaleFoundersFeed</title>
+  <meta name="description" content="Nyheder om female founders & iværksætteri i Danmark – samlet ét sted.">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Crect width='64' height='64' rx='14' fill='%23000'/%3E%3Ctext x='50%25' y='53%25' text-anchor='middle' font-size='34' font-family='Arial' fill='%23fff'%3EF%3C/text%3E%3C/svg%3E" />
   <style>
-    :root {
-      --accent1: #00f5d4;
-      --accent2: #ff4ecd;
-      --text: #111;
+    /* Bold Startup theme tokens */
+    :root{
+      --bg:#0b0b0f;         /* dyb mørk baggrund */
+      --fg:#eef1f5;         /* lys tekst */
+      --muted:#a8acb3;      /* sekundær tekst */
+      --border:#1b1f26;     /* mørk kant */
+      --card:#10131a;       /* kort baggrund */
+      --chip:#141824;       /* filter chips */
+      --brand:#ffffff;      /* logo */
+      --accent1:#00d2ff;    /* neon teal */
+      --accent2:#ff4fd8;    /* neon pink */
+      --shadow:0 2px 14px rgba(0,0,0,.45);
     }
 
-    /* Baggrund */
-    body {
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(135deg, #1e528e 0%, #8a567a 50%, #f57c42 100%);
-      background-attachment: fixed;
-      background-size: cover;
-      font-family: system-ui, sans-serif;
-      color: var(--text);
-    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+
+    .container{max-width:1060px;margin:0 auto;padding:0 16px}
 
     /* Header */
-    header {
-      position: sticky;
-      top: 0;
-      z-index: 20;
-      background: rgba(11, 11, 15, 0.7);
-      backdrop-filter: saturate(1.1) blur(10px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-    }
-
-    .header-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 14px 20px;
-      flex-wrap: wrap;
-    }
-
+    header{position:sticky;top:0;z-index:20;background:rgba(11,11,15,.72);backdrop-filter:saturate(1.1) blur(10px);border-bottom:1px solid var(--border)}
+    .header-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:40px;height:40px;border-radius:14px;background:var(--brand);color:#000;display:grid;place-items:center;font-weight:900;box-shadow:var(--shadow)}
     .title {
-      margin: 0;
-      font-size: 32px;
-      font-weight: 900;
-      font-family: 'Poppins', system-ui, sans-serif;
-      letter-spacing: -0.02em;
-      color: var(--accent2);
-    }
+  margin: 0;
+  font-size: 32px;
+  font-weight: 900;
+  font-family: 'Poppins', system-ui, sans-serif;
+  letter-spacing: -0.02em;
+  color: var(--accent2); /* neon pink */
+}
+    .tagline{font-size:12px;color:var(--muted);margin-top:2px}
+    .updated{font-size:12px;color:var(--muted);white-space:nowrap}
+    .actions{display:flex;align-items:center;gap:8px}
+    .btn{border:1px solid var(--border);background:var(--chip);color:var(--fg);border-radius:999px;padding:8px 12px;font-size:12px;cursor:pointer;transition:all .12s ease}
+    .btn:hover{border-color:var(--accent1); box-shadow:0 0 0 2px color-mix(in oklab, var(--accent1) 35%, transparent)}
+    .btn:active{transform:translateY(1px)}
 
-    #q {
-      flex: 1;
-      min-width: 260px;
-      padding: 10px 12px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,.15);
-      background: rgba(0,0,0,.25);
-      color: #fff;
-    }
+    /* Controls */
+    .controls{padding:8px 0 14px}
+    .search{position:relative}
+    .search input{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:#0e1118;color:var(--fg);outline:none}
+    .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .chip {font-size:12px;padding:7px 12px;border:1px solid var(--border);border-radius:999px;background:var(--chip); cursor:pointer;transition:all .12s ease;color: var(--accent2); /* NYT: neon pink tekst */}
+    .chip.on{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#000;border-color:transparent}
+    .chip:hover{border-color:var(--accent2)}
 
-    /* Feed grid */
-    #feed {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 20px;
-      padding: 20px;
-    }
+    /* Content */
+    main{padding:22px 0 46px}
+    .grid{display:grid;grid-template-columns:1fr;gap:16px}
+    @media (min-width: 900px){.grid{grid-template-columns:1fr 1fr}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow);transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease}
+    .card:hover{transform:translateY(-2px); border-color:color-mix(in oklab, var(--accent1) 40%, var(--border)); box-shadow:0 0 0 1px color-mix(in oklab, var(--accent1) 25%, transparent), 0 8px 26px rgba(0,0,0,.45)}
+    .card h3{margin:0 0 6px;font-size:18px;line-height:1.25}
+    .card a{color:var(--fg);text-decoration:none}
+    .card a:hover{text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:3px}
+    .meta{font-size:12px;color:var(--muted)}
+    .summary{font-size:14px;margin-top:8px;color:color-mix(in oklab, var(--fg) 88%, #fff 0%)}
+    .topics{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+    .topic{font-size:10px;border:1px solid var(--border);border-radius:999px;padding:4px 8px;background:#0d1017}
+    .empty{color:var(--muted);font-size:14px}
 
-    /* Kort */
-    .card {
-      background: rgba(255, 255, 255, 0.85);
-      border-radius: 16px;
-      padding: 16px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
+    /* Footer */
+    footer{border-top:1px solid var(--border)}
+    footer .container{padding:16px 0 28px;font-size:12px;color:var(--muted)}
 
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    .card h3 {
-      margin-top: 0;
-    }
-
-    .meta {
-      font-size: 0.9em;
-      color: #555;
-      margin-bottom: 8px;
-    }
-
-    .summary {
-      font-size: 1em;
-      line-height: 1.4;
-      margin-bottom: 12px;
-    }
-
-    .topics {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .topic {
-      background: var(--accent2);
-      color: #fff;
-      border-radius: 20px;
-      padding: 4px 10px;
-      font-size: 0.85em;
-    }
-
-    /* Knapper */
-    .btn {
-      border: 1px solid rgba(255,255,255,.2);
-      background: rgba(0,0,0,.25);
-      color: #fff;
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-
-    .btn:hover {
-      background: rgba(0,0,0,.4);
-    }
-
-    .empty {
-      text-align: center;
-      margin: 20px;
-      color: #fff;
-      opacity: 0.9;
-    }
+    /* Pager */
+    #pager{display:none;margin:18px 0 10px;text-align:center}
+    #countInfo{margin-top:8px}
   </style>
 </head>
 <body>
   <header>
-    <div class="header-inner">
-      <h1 class="title">Female Founders Feed</h1>
-      <button id="themeBtn" class="btn">☀️ Lys</button>
+    <div class="container header-inner">
+      <div class="brand">
+        <div class="logo">F</div>
+        <div>
+          <h1 class="title">Female Founders Feed</h1>
+          <div class="tagline">Nyheder om female founders & iværksætteri i DK – samlet ét sted</div>
+        </div>
+      </div>
+      <div class="actions">
+        <div class="updated" id="lastUpdated"></div>
+        <button id="themeBtn" class="btn" title="Skift tema">☀️ Lys</button>
+      </div>
     </div>
-    <div class="header-inner" style="gap:10px; flex-wrap:wrap;">
-      <input id="q" placeholder="Søg i titler, resumé og kilder…" autocomplete="off">
-      <div id="chips" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
+    <div class="container controls">
+      <div class="search">
+        <input id="q" placeholder="Søg i titler, resumé og kilder…" autocomplete="off" />
+      </div>
+      <div class="chips" id="chips"></div>
     </div>
   </header>
 
-  <main>
+  <main class="container">
     <div id="loading" class="empty">Indlæser nyheder…</div>
-    <div id="empty" class="empty" style="display:none;">Ingen artikler matcher dine filtre.</div>
+    <div id="empty" class="empty" style="display:none">Ingen artikler matcher dine filtre.</div>
+    <div id="feed" class="grid" style="display:none"></div>
 
-    <div id="feed" style="display:none;"></div>
-
-    <div id="pager" style="display:none; margin:18px 0 10px; text-align:center;">
+    <!-- Pager (Vis 30 mere) -->
+    <div id="pager">
       <button id="moreBtn" class="btn">Vis 30 mere</button>
       <div id="countInfo" class="empty"></div>
     </div>
   </main>
 
-  <script src="app.js"></script>
+  <footer>
+    <div class="container">
+      FemaleFoundersFeed samler offentligt tilgængelige overskrifter og linker videre til kilderne.
+      Vi er ikke ansvarlige for eksternt indhold. Respektér kilders vilkår og rettigheder.
+    </div>
+  </footer>
+
+  <script src="./app.js"></script>
 </body>
 </html>
