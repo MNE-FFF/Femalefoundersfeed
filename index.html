@@ -29,7 +29,7 @@
     .container{max-width:1060px;margin:0 auto;padding:0 16px}
 
     /* Header */
-    header{position:sticky;top:0;z-index:20;background:rgba(11,11,15,.72);backdrop-filter:saturate(1.1) blur(10px);border-bottom:1px solid var(--border)}
+    header{position:sticky;top:0;z-index:20;background:var(--bg);backdrop-filter:saturate(1.1) blur(10px);border-bottom:1px solid var(--border)}
     .header-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0}
     .brand{display:flex;align-items:center;gap:12px}
     .logo{width:40px;height:40px;border-radius:14px;background:var(--brand);color:#000;display:grid;place-items:center;font-weight:900;box-shadow:var(--shadow)}
@@ -44,7 +44,7 @@
     .tagline{font-size:12px;color:var(--muted);margin-top:2px}
     .updated{font-size:12px;color:var(--muted);white-space:nowrap}
     .actions{display:flex;align-items:center;gap:8px}
-    .btn{border:1px solid var(--border);background:var(--chip);color:var(--fg);border-radius:999px;padding:8px 12px;font-size:12px;cursor:pointer;transition:all .12s ease}
+    .btn{border:1px solid var(--border);background:var(--bg);color:var(--fg);border-radius:999px;padding:8px 12px;font-size:12px;cursor:pointer;transition:all .12s ease}
     .btn:hover{border-color:var(--accent1); box-shadow:0 0 0 2px color-mix(in oklab, var(--accent1) 35%, transparent)}
     .btn:active{transform:translateY(1px)}
 
