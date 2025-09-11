@@ -35,7 +35,8 @@ import hashlib
 import json
 import re
 import sys
-from datetime import datetime, timezone
+import time
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Dict, List
 
@@ -149,12 +150,21 @@ def main() -> None:
                 continue
 
             summary = clean_html(e.get("summary") or e.get("description") or "")
-            published = (
-                e.get("published")
-                or e.get("updated")
-                or e.get("pubDate")
-                or now_iso()
-            )
+                # --- NY: robust timestamp ---
+    ts_struct = e.get("published_parsed") or e.get("updated_parsed")
+    if ts_struct:
+        ts = datetime.fromtimestamp(time.mktime(ts_struct), tz=timezone.utc)
+    else:
+        # fallback hvis feed mangler dato
+        ts = datetime.now(timezone.utc)
+
+    # filtrér gamle artikler væk
+    cutoff = datetime.now(timezone.utc) - timedelta(days=int(cfg.get("max_age_days", 120)))
+    if ts < cutoff:
+        continue
+
+    published = ts.isoformat()
+
 
             if is_excluded(title, summary, rx_exclude):
                 continue
