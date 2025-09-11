@@ -27,7 +27,7 @@
       position: sticky;
       top: 0;
       z-index: 20;
-      background: rgba(11, 11, 15, 0.7); /* let gennemsigtighed */
+      background: rgba(11, 11, 15, 0.7);
       backdrop-filter: saturate(1.1) blur(10px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.15);
     }
@@ -38,6 +38,7 @@
       justify-content: space-between;
       gap: 12px;
       padding: 14px 20px;
+      flex-wrap: wrap;
     }
 
     .title {
@@ -47,6 +48,16 @@
       font-family: 'Poppins', system-ui, sans-serif;
       letter-spacing: -0.02em;
       color: var(--accent2);
+    }
+
+    #q {
+      flex: 1;
+      min-width: 260px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.15);
+      background: rgba(0,0,0,.25);
+      color: #fff;
     }
 
     /* Feed grid */
@@ -59,7 +70,7 @@
 
     /* Kort */
     .card {
-      background: rgba(255, 255, 255, 0.85); /* semi-transparent */
+      background: rgba(255, 255, 255, 0.85);
       border-radius: 16px;
       padding: 16px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
@@ -94,10 +105,33 @@
     }
 
     .topic {
-      background: rgba(0, 0, 0, 0.08);
+      background: var(--accent2);
+      color: #fff;
       border-radius: 20px;
       padding: 4px 10px;
       font-size: 0.85em;
+    }
+
+    /* Knapper */
+    .btn {
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(0,0,0,.25);
+      color: #fff;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: rgba(0,0,0,.4);
+    }
+
+    .empty {
+      text-align: center;
+      margin: 20px;
+      color: #fff;
+      opacity: 0.9;
     }
   </style>
 </head>
@@ -105,11 +139,24 @@
   <header>
     <div class="header-inner">
       <h1 class="title">Female Founders Feed</h1>
+      <button id="themeBtn" class="btn">☀️ Lys</button>
+    </div>
+    <div class="header-inner" style="gap:10px; flex-wrap:wrap;">
+      <input id="q" placeholder="Søg i titler, resumé og kilder…" autocomplete="off">
+      <div id="chips" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
     </div>
   </header>
 
-  <main id="feed">
-    <!-- Artikler bliver fyldt ind af app.js -->
+  <main>
+    <div id="loading" class="empty">Indlæser nyheder…</div>
+    <div id="empty" class="empty" style="display:none;">Ingen artikler matcher dine filtre.</div>
+
+    <div id="feed" style="display:none;"></div>
+
+    <div id="pager" style="display:none; margin:18px 0 10px; text-align:center;">
+      <button id="moreBtn" class="btn">Vis 30 mere</button>
+      <div id="countInfo" class="empty"></div>
+    </div>
   </main>
 
   <script src="app.js"></script>
