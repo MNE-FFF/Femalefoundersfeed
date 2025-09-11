@@ -160,8 +160,10 @@ def main() -> None:
                 continue
 
             s = score_item(title, summary, regs, weights)
-            if s < min_score:
-                continue
+            has_gender = regs["gender"] and regs["gender"].search(f"{title}\n{summary}")
+
+            if s < min_score or not has_gender:
+            continue
 
             _id = hash_id(link, title)
             if _id in ids:
