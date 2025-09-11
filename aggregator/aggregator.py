@@ -163,7 +163,7 @@ def main() -> None:
             has_gender = regs["gender"] and regs["gender"].search(f"{title}\n{summary}")
 
             if s < min_score or not has_gender:
-            continue
+                continue
 
             _id = hash_id(link, title)
             if _id in ids:
