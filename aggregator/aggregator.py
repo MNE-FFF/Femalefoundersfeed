@@ -24,6 +24,7 @@ Config (aggregator/config.yaml):
     title_bonus: 1
   min_score: 2
   export_limit: 200
+  max_age_days: 120              # NY: kun nyere end N dage
 
 Kør lokalt:
   pip install -r aggregator/requirements.txt
@@ -73,6 +74,7 @@ def load_config() -> dict:
     cfg.setdefault("min_score", 2)
     cfg.setdefault("export_limit", 200)
     cfg.setdefault("weights", {"gender": 2, "startup": 2, "business": 1, "title_bonus": 1})
+    cfg.setdefault("max_age_days", 120)
     return cfg
 
 def compile_or_none(terms: List[str]) -> re.Pattern | None:
@@ -82,27 +84,20 @@ def compile_or_none(terms: List[str]) -> re.Pattern | None:
     return re.compile("(" + "|".join(terms) + ")", re.IGNORECASE)
 
 def score_item(title: str, summary: str, regs: Dict[str, re.Pattern | None], weights: Dict[str, int]) -> int:
-    """
-    Returnerer samlet score for en artikel.
-    - tæller mindst 1 pr. kategori (ikke pr. forekomst) for at undgå over-score
-    - giver ekstra bonus hvis kategori også findes i TITLEN
-    """
+    """Returnerer samlet score for en artikel (kategori-vis, ikke pr. forekomst)."""
     hay = f"{title}\n{summary}"
     score = 0
 
-    # gender
     if regs["gender"] and regs["gender"].search(hay):
         score += int(weights.get("gender", 2))
         if regs["gender"].search(title):
             score += int(weights.get("title_bonus", 1))
 
-    # startup
     if regs["startup"] and regs["startup"].search(hay):
         score += int(weights.get("startup", 2))
         if regs["startup"].search(title):
             score += int(weights.get("title_bonus", 1))
 
-    # business
     if regs["business"] and regs["business"].search(hay):
         score += int(weights.get("business", 1))
         if regs["business"].search(title):
@@ -131,6 +126,8 @@ def main() -> None:
     rx_exclude = compile_or_none(cfg.get("exclude_keywords", []))
     weights = cfg.get("weights", {"gender": 2, "startup": 2, "business": 1, "title_bonus": 1})
     min_score = int(cfg.get("min_score", 2))
+    max_age_days = int(cfg.get("max_age_days", 120))
+    cutoff = datetime.now(timezone.utc) - timedelta(days=max_age_days)
 
     entries = []
     ids = set()
@@ -150,28 +147,28 @@ def main() -> None:
                 continue
 
             summary = clean_html(e.get("summary") or e.get("description") or "")
-                # --- NY: robust timestamp ---
-    ts_struct = e.get("published_parsed") or e.get("updated_parsed")
-    if ts_struct:
-        ts = datetime.fromtimestamp(time.mktime(ts_struct), tz=timezone.utc)
-    else:
-        # fallback hvis feed mangler dato
-        ts = datetime.now(timezone.utc)
 
-    # filtrér gamle artikler væk
-    cutoff = datetime.now(timezone.utc) - timedelta(days=int(cfg.get("max_age_days", 120)))
-    if ts < cutoff:
-        continue
+            # --- robust timestamp ---
+            ts_struct = e.get("published_parsed") or e.get("updated_parsed")
+            if ts_struct:
+                ts = datetime.fromtimestamp(time.mktime(ts_struct), tz=timezone.utc)
+            else:
+                # fallback hvis feed mangler dato
+                ts = datetime.now(timezone.utc)
 
-    published = ts.isoformat()
+            # filtrér gamle artikler væk
+            if ts < cutoff:
+                continue
 
+            published = ts.isoformat()
 
+            # eksklusionsord
             if is_excluded(title, summary, rx_exclude):
                 continue
 
+            # scoring + krav om gender-match
             s = score_item(title, summary, regs, weights)
             has_gender = regs["gender"] and regs["gender"].search(f"{title}\n{summary}")
-
             if s < min_score or not has_gender:
                 continue
 
@@ -194,13 +191,13 @@ def main() -> None:
         print(f"[INFO] {url}: +{added} items (total {len(entries)})")
 
     # sort newest first
-    def ts(x):
+    def ts_key(x):
         try:
             return datetime.fromisoformat(str(x["published"]).replace("Z", "+00:00"))
         except Exception:
             return datetime(1970, 1, 1, tzinfo=timezone.utc)
 
-    entries.sort(key=ts, reverse=True)
+    entries.sort(key=ts_key, reverse=True)
     entries = entries[: int(cfg.get("export_limit", 200))]
 
     with open(OUTPUT_PATH, "w", encoding="utf-8") as f:
