@@ -36,6 +36,11 @@ feeds:
   - "https://news.google.com/rss/search?q=female%20founders%20Denmark%20when:90d&hl=en&gl=DK&ceid=DK:en"
   - "https://news.google.com/rss/search?q=kvindelig%20stifter%20virksomhed%20when:90d&hl=da&gl=DK&ceid=DK:da"
   - "https://news.google.com/rss/search?q=kvindeejet%20virksomhed%20when:90d&hl=da&gl=DK&ceid=DK:da"
+  - "https://news.google.com/rss/search?q=kvinder%20iv%C3%A6rks%C3%A6tteri%20when:90d&hl=da&gl=DK&ceid=DK:da"
+  - "https://news.google.com/rss/search?q=kvindelig%20founder%20OR%20stifter%20when:90d&hl=da&gl=DK&ceid=DK:da"
+  - "https://news.google.com/rss/search?q=women%20founders%20Denmark%20when:90d&hl=en&gl=DK&ceid=DK:en"
+  - "https://news.google.com/rss/search?q=kvindeejet%20virksomhed%20when:90d&hl=da&gl=DK&ceid=DK:da"
+
 
 
 keywords_gender:
