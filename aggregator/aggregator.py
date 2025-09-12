@@ -45,6 +45,10 @@ import feedparser
 from bs4 import BeautifulSoup
 import yaml
 
+import requests
+from urllib.parse import urlparse, urljoin
+
+
 # --- Stier ---
 ROOT = Path(__file__).resolve().parent.parent  # repo-roden
 CONFIG_PATH = ROOT / "aggregator" / "config.yaml"
@@ -110,6 +114,73 @@ def is_excluded(title: str, summary: str, rx_exclude: re.Pattern | None) -> bool
         return False
     hay = f"{title}\n{summary}"
     return bool(rx_exclude.search(hay))
+
+def domain_of(u: str) -> str:
+    try:
+        host = urlparse(u).netloc.lower()
+        return host[4:] if host.startswith("www.") else host
+    except Exception:
+        return ""
+
+def absolute_links(page_url: str, soup: BeautifulSoup) -> list[str]:
+    links = []
+    for a in soup.find_all("a", href=True):
+        href = a["href"].strip()
+        if not href: 
+            continue
+        absu = urljoin(page_url, href)
+        links.append((absu, a.get_text(strip=True)))
+    return links
+
+def scrape_press_page(page_url: str, expected_domain: str, max_items: int = 30) -> list[dict]:
+    """Henter en presseside (HTML), finder links på samme domæne og returnerer som entries.
+       Rækkefølge bevares; vi tildeler kunstige timestamps (nu, nu-1min, ...)."""
+    out = []
+    try:
+        r = requests.get(page_url, timeout=20, headers={"User-Agent": "FemaleFoundersFeed/1.0"})
+        r.raise_for_status()
+    except Exception as ex:
+        print(f"[WARN] Failed to fetch press page {page_url}: {ex}", file=sys.stderr)
+        return out
+
+    soup = BeautifulSoup(r.text, "html.parser")
+    pairs = absolute_links(page_url, soup)
+
+    # Filtrér: samme domæne, rimelig linktekst, undgå sociale/fil-ting
+    seen = set()
+    filtered = []
+    for absu, text in pairs:
+        dom = domain_of(absu)
+        if expected_domain and domain_of("https://" + expected_domain) != dom and expected_domain != dom:
+            continue
+        if any(s in absu.lower() for s in ["/wp-json", "/feed", ".pdf", "mailto:", "tel:"]):
+            continue
+        if len(text) < 6:  # undgå “Læs mere”, “Klik”, mm.
+            continue
+        key = (absu, text)
+        if key in seen:
+            continue
+        seen.add(key)
+        filtered.append((absu, text))
+
+    # Behold top N i den rækkefølge de står (antag siden viser nyeste øverst)
+    filtered = filtered[:max_items]
+
+    # Kunstige tidsstempler for at bevare rækkefølge
+    now = datetime.now(timezone.utc)
+    for idx, (absu, text) in enumerate(filtered):
+        ts = now - timedelta(minutes=idx)
+        out.append({
+            "title": text,
+            "link": absu,
+            "summary": "",                  # optional: kunne forsøge at hente teaser-tekst
+            "published": ts.isoformat(),
+            "source": expected_domain or domain_of(absu),
+        })
+    print(f"[INFO] Press page {page_url}: +{len(out)} items")
+    return out
+
+
 
 def main() -> None:
     cfg = load_config()
@@ -190,6 +261,24 @@ def main() -> None:
         added = len(entries) - count_before
         print(f"[INFO] {url}: +{added} items (total {len(entries)})")
 
+# --- NYT: håndtér pressesider uden RSS ---
+press_pages = cfg.get("press_pages", [])
+for p in press_pages:
+    page_url = p.get("url")
+    dom = p.get("domain") or (domain_of(page_url) if page_url else "")
+    max_items = int(p.get("max_items", 30))
+    if not page_url:
+        continue
+
+    press_entries = scrape_press_page(page_url, dom, max_items=max_items)
+    # deduplikér mod eksisterende by link+title hash
+    for item in press_entries:
+        _id = hash_id(item["link"], item["title"])
+        if _id in ids:
+            continue
+        ids.add(_id)
+        entries.append(item)
+   
     # sort newest first
     def ts_key(x):
         try:
