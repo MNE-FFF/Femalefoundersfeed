@@ -132,3 +132,4 @@ press_pages:
   - url: "https://nordicfemalefounders.dk/presse/pressemeddelelser"
     domain: "nordicfemalefounders.dk"
     max_items: 30
+    href_include: "/presse/"
