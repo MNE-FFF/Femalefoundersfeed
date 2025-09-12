@@ -261,23 +261,25 @@ def main() -> None:
         added = len(entries) - count_before
         print(f"[INFO] {url}: +{added} items (total {len(entries)})")
 
-# --- NYT: håndtér pressesider uden RSS ---
-press_pages = cfg.get("press_pages", [])
-for p in press_pages:
-    page_url = p.get("url")
-    dom = p.get("domain") or (domain_of(page_url) if page_url else "")
-    max_items = int(p.get("max_items", 30))
-    if not page_url:
-        continue
-
-    press_entries = scrape_press_page(page_url, dom, max_items=max_items)
-    # deduplikér mod eksisterende by link+title hash
-    for item in press_entries:
-        _id = hash_id(item["link"], item["title"])
-        if _id in ids:
+     # --- NYT: håndtér pressesider uden RSS ---
+        # --- NYT: håndtér pressesider uden RSS ---
+    press_pages = cfg.get("press_pages", [])
+    for p in press_pages:
+        page_url = p.get("url")
+        dom = p.get("domain") or (domain_of(page_url) if page_url else "")
+        max_items = int(p.get("max_items", 30))
+        if not page_url:
             continue
-        ids.add(_id)
-        entries.append(item)
+
+        press_entries = scrape_press_page(page_url, dom, max_items=max_items)
+        # deduplikér mod eksisterende by link+title hash
+        for item in press_entries:
+            _id = hash_id(item["link"], item["title"])
+            if _id in ids:
+                continue
+            ids.add(_id)
+            entries.append(item)
+
    
     # sort newest first
     def ts_key(x):
