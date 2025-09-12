@@ -128,3 +128,7 @@ export_limit: 200
 
 max_age_days: 120   # kun artikler nyere end 120 dage
 
+press_pages:
+  - url: "https://nordicfemalefounders.dk/presse/pressemeddelelser"
+    domain: "nordicfemalefounders.dk"
+    max_items: 30
