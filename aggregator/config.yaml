@@ -111,11 +111,19 @@ keywords_business:
 
 exclude_keywords:
   - superliga
+  - football
+  - soccer
   - fodbold
+  - handball
   - håndbold
+  - cycling
   - cykling
+  - concert
   - koncert
   - celebrity
+  - celebrities
+  - gossip
+
 
 weights:
   gender: 2
@@ -123,7 +131,7 @@ weights:
   business: 1
   title_bonus: 1
 
-min_score: 3
+min_score: 2
 export_limit: 200
 
 max_age_days: 1095   # kun artikler nyere end 120 dage
