@@ -53,8 +53,12 @@
     .search{position:relative}
     .search input{width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:#0e1118;color:var(--fg);outline:none}
     .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-    .chip {font-size:12px;padding:7px 12px;border:1px solid var(--border);border-radius:999px;background:var(--chip); cursor:pointer;transition:all .12s ease;color: var(--accent2); /* NYT: neon pink tekst */}
-    .chip.on{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#000;border-color:transparent}
+    .chip {font-size:12px;padding:7px 12px;border:1px solid var(--border);border-radius:999px;background: linear-gradient(135deg,rgba(255, 79, 207, 0.8) 0%,rgba(255, 79, 207, 0.5) 100% );
+      cursor:pointer;
+      transition:all .12s ease;
+      color: #fff; /* tekst ændres til hvid */ }
+
+    .chip.on {background: linear-gradient(135deg, rgba(255,79,207,1) 0%, rgba(255,79,207,0.7) 100%);color: #fff;border-color: transparent;}
     .chip:hover{border-color:var(--accent2)}
 
     /* Content */
