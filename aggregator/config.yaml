@@ -126,7 +126,7 @@ weights:
 min_score: 3
 export_limit: 200
 
-max_age_days: 120   # kun artikler nyere end 120 dage
+max_age_days: 1095   # kun artikler nyere end 120 dage
 
 press_pages:
   - url: "https://nordicfemalefounders.dk/presse/pressemeddelelser"
