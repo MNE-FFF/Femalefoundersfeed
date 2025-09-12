@@ -61,7 +61,17 @@
     main{padding:22px 0 46px}
     .grid{display:grid;grid-template-columns:1fr;gap:16px}
     @media (min-width: 900px){.grid{grid-template-columns:1fr 1fr}}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:var(--shadow);transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease}
+    .card {background: linear-gradient(
+    135deg,
+    rgba(255, 79, 207, 0.5) 0%,   /* pink 50% */
+    rgba(255, 79, 207, 0.2) 100%  /* falmer ud */
+    );
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: var(--shadow);
+    transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    color: white; /* gør teksten læsbar ovenpå pink */}
     .card:hover{transform:translateY(-2px); border-color:color-mix(in oklab, var(--accent1) 40%, var(--border)); box-shadow:0 0 0 1px color-mix(in oklab, var(--accent1) 25%, transparent), 0 8px 26px rgba(0,0,0,.45)}
     .card h3{margin:0 0 6px;font-size:18px;line-height:1.25}
     .card a{color:var(--fg);text-decoration:none}
