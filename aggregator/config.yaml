@@ -24,6 +24,8 @@ feeds:
   - https://www.technordicadvocates.org/news/feed/
   - https://www.evenfounders.com/blogs/overview/feed/
   - https://nordicfemalefounders.dk/presse/pressemeddelelser/feed/
+  - https://nordicfemalefounders.dk/feed/
+
 
   # ——— Nordics/EU/international (kan have DK-cases) ———
   - https://www.eu-startups.com/feed/
@@ -49,6 +51,8 @@ feeds:
   - "https://news.google.com/rss/search?q=site:momkind.dk&hl=da&gl=DK&ceid=DK:da"
   - "https://news.google.com/rss/search?q=site:thefootprintfirm.com&hl=da&gl=DK&ceid=DK:da"
   - "https://news.google.com/rss/search?q=site:femaleinvest.com&hl=da&gl=DK&ceid=DK:da"
+  - "https://news.google.com/rss/search?q=site:nordicfemalefounders.dk&hl=da&gl=DK&ceid=DK:da"
+
 
 
 
