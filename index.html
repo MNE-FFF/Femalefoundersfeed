@@ -34,13 +34,13 @@
     .brand{display:flex;align-items:center;gap:12px}
     .logo{width:40px;height:40px;border-radius:14px;background:var(--brand);color:#000;display:grid;place-items:center;font-weight:900;box-shadow:var(--shadow)}
     .title {
-  margin: 0;
-  font-size: 32px;
-  font-weight: 900;
-  font-family: 'Poppins', system-ui, sans-serif;
-  letter-spacing: -0.02em;
-  color: var(--accent2); /* neon pink */
-}
+      margin: 0;
+      font-size: 32px;
+      font-weight: 900;
+      font-family: 'Poppins', system-ui, sans-serif;
+      letter-spacing: -0.02em;
+      color: var(--accent2); /* neon pink */
+    }
     .tagline{font-size:12px;color:var(--muted);margin-top:2px}
     .updated{font-size:12px;color:var(--muted);white-space:nowrap}
     .actions{display:flex;align-items:center;gap:8px}
@@ -79,7 +79,11 @@
     .meta{font-size:12px;color:var(--muted)}
     .summary{font-size:14px;margin-top:8px;color:color-mix(in oklab, var(--fg) 88%, #fff 0%)}
     .topics{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
-    .topic{font-size:10px;border:1px solid var(--border);border-radius:999px;padding:4px 8px;background:#0d1017}
+    .topic {font-size: 10px;border: 1px solid var(--border);border-radius: 999px;padding: 4px 8px;background: linear-gradient(135deg,
+    rgba(255, 79, 207, 0.8) 0%,
+    rgba(255, 79, 207, 0.5) 100% );
+    color: #fff; /* tekstfarve ændret til hvid */}
+
     .empty{color:var(--muted);font-size:14px}
 
     /* Footer */
