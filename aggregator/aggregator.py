@@ -132,7 +132,9 @@ def absolute_links(page_url: str, soup: BeautifulSoup) -> list[str]:
         links.append((absu, a.get_text(strip=True)))
     return links
 
-def scrape_press_page(page_url: str, expected_domain: str, max_items: int = 30) -> list[dict]:
+def scrape_press_page(page_url: str, expected_domain: str, max_items: int = 30,
+                      href_include: str | None = None, href_exclude: str | None = None) -> list[dict]:
+
     """Henter en presseside (HTML), finder links på samme domæne og returnerer som entries.
        Rækkefølge bevares; vi tildeler kunstige timestamps (nu, nu-1min, ...)."""
     out = []
@@ -147,21 +149,49 @@ def scrape_press_page(page_url: str, expected_domain: str, max_items: int = 30) 
     pairs = absolute_links(page_url, soup)
 
     # Filtrér: samme domæne, rimelig linktekst, undgå sociale/fil-ting
+        # Filtrér: samme domæne, match på sti, undgå sociale/fil-ting
     seen = set()
     filtered = []
+
+    base_path = urlparse(page_url).path.rstrip("/")
+    inc_re = re.compile(href_include) if href_include else None
+    exc_re = re.compile(href_exclude) if href_exclude else None
+
     for absu, text in pairs:
         dom = domain_of(absu)
-        if expected_domain and domain_of("https://" + expected_domain) != dom and expected_domain != dom:
+        if expected_domain and dom != domain_of("https://" + expected_domain):
             continue
+
+        u = urlparse(absu)
+        path = (u.path or "").lower()
+
+        # Fjern støj
         if any(s in absu.lower() for s in ["/wp-json", "/feed", ".pdf", "mailto:", "tel:"]):
             continue
-        if len(text) < 6:  # undgå “Læs mere”, “Klik”, mm.
+
+        # Kræv rimelig linktekst
+        if len(text) < 6:
             continue
+
+        # Kræv at linket hører til pressesektionen
+        ok_path = False
+        if inc_re:
+            ok_path = bool(inc_re.search(path))
+        else:
+            # fallback: kræv at sti starter med sidens sti (typisk /presse/pressemeddelelser)
+            ok_path = path.startswith(base_path) or base_path in path
+
+        if not ok_path:
+            continue
+        if exc_re and exc_re.search(path):
+            continue
+
         key = (absu, text)
         if key in seen:
             continue
         seen.add(key)
         filtered.append((absu, text))
+
 
     # Behold top N i den rækkefølge de står (antag siden viser nyeste øverst)
     filtered = filtered[:max_items]
@@ -268,11 +298,14 @@ def main() -> None:
         page_url = p.get("url")
         dom = p.get("domain") or (domain_of(page_url) if page_url else "")
         max_items = int(p.get("max_items", 30))
+        inc        = p.get("href_include")
+        exc        = p.get("href_exclude")
+       
         if not page_url:
             continue
 
-        press_entries = scrape_press_page(page_url, dom, max_items=max_items)
-        # deduplikér mod eksisterende by link+title hash
+        press_entries = scrape_press_page(page_url, dom, max_items=max_items,
+                                          href_include=inc, href_exclude=exc)
         for item in press_entries:
             _id = hash_id(item["link"], item["title"])
             if _id in ids:
