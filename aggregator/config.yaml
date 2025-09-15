@@ -177,3 +177,11 @@ press_pages:
     max_items: 50
     href_include: "/presse/"
 
+press_pages:
+  - url: "https://kvinfo.dk/publikationer/"
+    domain: "kvinfo.dk"
+    max_items: 80
+    href_include: "/publikationer/"
+    allow_pdf: true
+
+
