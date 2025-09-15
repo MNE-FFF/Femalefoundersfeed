@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """
-FemaleFoundersFeed — RSS aggregator (scoring-version)
+FemaleFoundersFeed — RSS aggregator (scoring + press pages + debug)
 
 Idé:
-- Vi scorer artikler i stedet for hårdt at afvise.
+- Scor artikler i stedet for hårdt at afvise.
 - +weight ved match på:
     * gender-ord (kvinde, women, …)
     * startup-ord (iværksætter, startup, founder, …)
     * business-ord (investering, direktør, kapital, …)
 - Ekstra lille bonus hvis match findes i titlen.
 - Ekskluderer artikler med "exclude_keywords" (fx sport) uanset score.
+- Understøtter "press_pages" (HTML-sider uden RSS) med rækkefølgen bevaret via kunstige timestamps.
 
 Config (aggregator/config.yaml):
   feeds: [ ... ]
@@ -24,12 +25,15 @@ Config (aggregator/config.yaml):
     title_bonus: 1
   min_score: 2
   export_limit: 200
-  max_age_days: 120              # NY: kun nyere end N dage
-
-Kør lokalt:
-  pip install -r aggregator/requirements.txt
-  python aggregator/aggregator.py
+  max_age_days: 120
+  press_pages:
+    - url: "https://nordicfemalefounders.dk/presse/pressemeddelelser"
+      domain: "nordicfemalefounders.dk"
+      max_items: 30
+      href_include: "/presse/"   # valgfri (regex/substring)
+      href_exclude: null         # valgfri (regex)
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -44,10 +48,8 @@ from typing import Dict, List
 import feedparser
 from bs4 import BeautifulSoup
 import yaml
-
 import requests
 from urllib.parse import urlparse, urljoin
-
 
 # --- Stier ---
 ROOT = Path(__file__).resolve().parent.parent  # repo-roden
@@ -122,22 +124,27 @@ def domain_of(u: str) -> str:
     except Exception:
         return ""
 
-def absolute_links(page_url: str, soup: BeautifulSoup) -> list[str]:
-    links = []
+def absolute_links(page_url: str, soup: BeautifulSoup) -> list[tuple[str, str]]:
+    links: list[tuple[str, str]] = []
     for a in soup.find_all("a", href=True):
         href = a["href"].strip()
-        if not href: 
+        if not href:
             continue
         absu = urljoin(page_url, href)
-        links.append((absu, a.get_text(strip=True)))
+        text = a.get_text(strip=True)
+        links.append((absu, text))
     return links
 
-def scrape_press_page(page_url: str, expected_domain: str, max_items: int = 30,
-                      href_include: str | None = None, href_exclude: str | None = None) -> list[dict]:
-
+def scrape_press_page(
+    page_url: str,
+    expected_domain: str,
+    max_items: int = 30,
+    href_include: str | None = None,
+    href_exclude: str | None = None,
+) -> list[dict]:
     """Henter en presseside (HTML), finder links på samme domæne og returnerer som entries.
        Rækkefølge bevares; vi tildeler kunstige timestamps (nu, nu-1min, ...)."""
-    out = []
+    out: list[dict] = []
     try:
         r = requests.get(page_url, timeout=20, headers={"User-Agent": "FemaleFoundersFeed/1.0"})
         r.raise_for_status()
@@ -148,10 +155,9 @@ def scrape_press_page(page_url: str, expected_domain: str, max_items: int = 30,
     soup = BeautifulSoup(r.text, "html.parser")
     pairs = absolute_links(page_url, soup)
 
-    # Filtrér: samme domæne, rimelig linktekst, undgå sociale/fil-ting
-        # Filtrér: samme domæne, match på sti, undgå sociale/fil-ting
-    seen = set()
-    filtered = []
+    # Filtrér: samme domæne, match på sti, undgå sociale/fil-ting
+    seen: set[tuple[str, str]] = set()
+    filtered: list[tuple[str, str]] = []
 
     base_path = urlparse(page_url).path.rstrip("/")
     inc_re = re.compile(href_include) if href_include else None
@@ -159,8 +165,10 @@ def scrape_press_page(page_url: str, expected_domain: str, max_items: int = 30,
 
     for absu, text in pairs:
         dom = domain_of(absu)
-        if expected_domain and dom != domain_of("https://" + expected_domain):
-            continue
+        if expected_domain:
+            expected_norm = domain_of("https://" + expected_domain)
+            if dom != expected_norm and dom != expected_domain:
+                continue
 
         u = urlparse(absu)
         path = (u.path or "").lower()
@@ -192,7 +200,6 @@ def scrape_press_page(page_url: str, expected_domain: str, max_items: int = 30,
         seen.add(key)
         filtered.append((absu, text))
 
-
     # Behold top N i den rækkefølge de står (antag siden viser nyeste øverst)
     filtered = filtered[:max_items]
 
@@ -203,15 +210,14 @@ def scrape_press_page(page_url: str, expected_domain: str, max_items: int = 30,
         out.append({
             "title": text,
             "link": absu,
-            "summary": "",                  # optional: kunne forsøge at hente teaser-tekst
+            "summary": "",                  # (kan evt. udvides til at hente teaser)
             "published": ts.isoformat(),
             "source": expected_domain or domain_of(absu),
         })
     print(f"[INFO] Press page {page_url}: +{len(out)} items")
     return out
 
-
-
+# --- Main ---
 def main() -> None:
     cfg = load_config()
     feeds = cfg.get("feeds", [])
@@ -220,9 +226,9 @@ def main() -> None:
 
     # compile regex
     regs = {
-        "gender": compile_or_none(cfg.get("keywords_gender", [])),
+        "gender":  compile_or_none(cfg.get("keywords_gender", [])),
         "startup": compile_or_none(cfg.get("keywords_startup", [])),
-        "business": compile_or_none(cfg.get("keywords_business", [])),
+        "business":compile_or_none(cfg.get("keywords_business", [])),
     }
     rx_exclude = compile_or_none(cfg.get("exclude_keywords", []))
     weights = cfg.get("weights", {"gender": 2, "startup": 2, "business": 1, "title_bonus": 1})
@@ -230,9 +236,10 @@ def main() -> None:
     max_age_days = int(cfg.get("max_age_days", 120))
     cutoff = datetime.now(timezone.utc) - timedelta(days=max_age_days)
 
-    entries = []
-    ids = set()
+    entries: list[dict] = []
+    ids: set[str] = set()
 
+    # --- RSS feeds ---
     for url in feeds:
         count_before = len(entries)
         try:
@@ -243,8 +250,9 @@ def main() -> None:
 
         for e in parsed.entries:
             title = (e.get("title") or "").strip()
-            link = (e.get("link") or "").strip()
+            link  = (e.get("link")  or "").strip()
             if not title or not link:
+                print(f"[SKIP] Mangler titel/link i feed {url}")
                 continue
 
             summary = clean_html(e.get("summary") or e.get("description") or "")
@@ -259,22 +267,30 @@ def main() -> None:
 
             # filtrér gamle artikler væk
             if ts < cutoff:
+                print(f"[SKIP] For gammel: '{title}' ({ts.date()}) fra {url}")
                 continue
 
             published = ts.isoformat()
 
             # eksklusionsord
             if is_excluded(title, summary, rx_exclude):
+                print(f"[SKIP] Exclude_keywords: '{title}' fra {url}")
                 continue
 
             # scoring + krav om gender-match
             s = score_item(title, summary, regs, weights)
             has_gender = regs["gender"] and regs["gender"].search(f"{title}\n{summary}")
-            if s < min_score or not has_gender:
+
+            if s < min_score:
+                print(f"[SKIP] For lav score ({s} < {min_score}): '{title}' fra {url}")
+                continue
+            if not has_gender:
+                print(f"[SKIP] Ingen gender-match: '{title}' fra {url}")
                 continue
 
             _id = hash_id(link, title)
             if _id in ids:
+                # (valgfri) print ikke for hver dublet for at undgå støj
                 continue
             ids.add(_id)
 
@@ -291,29 +307,36 @@ def main() -> None:
         added = len(entries) - count_before
         print(f"[INFO] {url}: +{added} items (total {len(entries)})")
 
-     # --- NYT: håndtér pressesider uden RSS ---
-        # --- NYT: håndtér pressesider uden RSS ---
+    # --- Press pages (uden RSS) ---
     press_pages = cfg.get("press_pages", [])
+    total_press_added = 0
     for p in press_pages:
-        page_url = p.get("url")
-        dom = p.get("domain") or (domain_of(page_url) if page_url else "")
-        max_items = int(p.get("max_items", 30))
-        inc        = p.get("href_include")
-        exc        = p.get("href_exclude")
-       
+        page_url   = p.get("url")
         if not page_url:
             continue
+        dom        = p.get("domain") or (domain_of(page_url) if page_url else "")
+        max_items  = int(p.get("max_items", 30))
+        inc        = p.get("href_include")
+        exc        = p.get("href_exclude")
 
         press_entries = scrape_press_page(page_url, dom, max_items=max_items,
                                           href_include=inc, href_exclude=exc)
+
+        # Dedup + (valgfrit) respect exclude_keywords for press
         for item in press_entries:
+            if is_excluded(item["title"], item.get("summary",""), rx_exclude):
+                print(f"[SKIP] Press exclude_keywords: '{item['title']}' fra {page_url}")
+                continue
             _id = hash_id(item["link"], item["title"])
             if _id in ids:
                 continue
             ids.add(_id)
             entries.append(item)
+            total_press_added += 1
 
-   
+    if total_press_added:
+        print(f"[INFO] Press pages: +{total_press_added} items (total {len(entries)})")
+
     # sort newest first
     def ts_key(x):
         try:
