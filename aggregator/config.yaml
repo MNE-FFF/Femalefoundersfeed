@@ -184,4 +184,11 @@ press_pages:
     href_include: "/publikationer/"
     allow_pdf: true
 
+press_pages:
+  - url: "https://www.evenfounders.com/blogs/overview"
+    domain: "evenfounders.com"
+    max_items: 50
+    href_include: "/blogs/"
+
+
 
