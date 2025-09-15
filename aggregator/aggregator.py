@@ -141,6 +141,7 @@ def scrape_press_page(
     max_items: int = 30,
     href_include: str | None = None,
     href_exclude: str | None = None,
+    allow_pdf: bool = False,
 ) -> list[dict]:
     """Henter en presseside (HTML), finder links på samme domæne og returnerer som entries.
        Rækkefølge bevares; vi tildeler kunstige timestamps (nu, nu-1min, ...)."""
@@ -173,9 +174,12 @@ def scrape_press_page(
         u = urlparse(absu)
         path = (u.path or "").lower()
 
-        # Fjern støj
-        if any(s in absu.lower() for s in ["/wp-json", "/feed", ".pdf", "mailto:", "tel:"]):
+         # Fjern støj
+        if any(s in absu.lower() for s in ["/wp-json", "/feed", "mailto:", "tel:"]):
             continue
+        if not allow_pdf and absu.lower().endswith(".pdf"):
+            continue
+
 
         # Kræv rimelig linktekst
         if len(text) < 6:
@@ -324,9 +328,12 @@ def main() -> None:
         max_items  = int(p.get("max_items", 30))
         inc        = p.get("href_include")
         exc        = p.get("href_exclude")
+        allow_pdf  = bool(p.get("allow_pdf", False))
 
-        press_entries = scrape_press_page(page_url, dom, max_items=max_items,
-                                          href_include=inc, href_exclude=exc)
+        press_entries = scrape_press_page(              # <-- send videre
+        page_url, dom, max_items=max_items,
+        href_include=inc, href_exclude=exc,
+        allow_pdf=allow_pdf)
 
         # Dedup + (valgfrit) respect exclude_keywords for press
         for item in press_entries:
