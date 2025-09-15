@@ -277,16 +277,22 @@ def main() -> None:
                 print(f"[SKIP] Exclude_keywords: '{title}' fra {url}")
                 continue
 
-            # scoring + krav om gender-match
-            s = score_item(title, summary, regs, weights)
-            has_gender = regs["gender"] and regs["gender"].search(f"{title}\n{summary}")
+            use_scoring = not bool(cfg.get("curated_mode", False))
 
-            if s < min_score:
-                print(f"[SKIP] For lav score ({s} < {min_score}): '{title}' fra {url}")
-                continue
-            if not has_gender:
-                print(f"[SKIP] Ingen gender-match: '{title}' fra {url}")
-                continue
+            if use_scoring:
+                # scoring + krav om gender-match
+                s = score_item(title, summary, regs, weights)
+                has_gender = regs["gender"] and regs["gender"].search(f"{title}\n{summary}")
+            
+                if s < min_score:
+                    print(f"[SKIP] For lav score ({s} < {min_score}): '{title}' fra {url}")
+                    continue
+                if not has_gender:
+                    print(f"[SKIP] Ingen gender-match: '{title}' fra {url}")
+                    continue
+            else:
+                # Curated mode: ingen score/gender-filtrering
+                print(f"[INFO] Curated mode: inkluderer '{title}' fra {url}")
 
             _id = hash_id(link, title)
             if _id in ids:
