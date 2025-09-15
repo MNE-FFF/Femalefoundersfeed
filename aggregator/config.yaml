@@ -143,3 +143,37 @@ press_pages:
     domain: "nordicfemalefounders.dk"
     max_items: 30
     href_include: "/presse/"
+
+
+# === Curated mode (nyt) ===
+curated_mode: true
+max_age_days: 1095   # 3 år
+
+exclude_keywords:
+  - superliga
+  - football
+  - soccer
+  - fodbold
+  - handball
+  - håndbold
+  - cycling
+  - cykling
+  - concert
+  - koncert
+  - celebrity
+  - celebrities
+  - gossip
+  - entertainment
+
+feeds:
+  - "https://kvinfo.dk/publikationer/feed/"
+  - "https://news.google.com/rss/search?q=site:femaleinvest.com&hl=da&gl=DK&ceid=DK:da"
+  - "https://news.google.com/rss/search?q=site:evenfounders.com&hl=da&gl=DK&ceid=DK:da"
+  - "https://news.google.com/rss/search?q=site:thefootprintfirm.com&hl=da&gl=DK&ceid=DK:da"
+
+press_pages:
+  - url: "https://nordicfemalefounders.dk/presse/pressemeddelelser"
+    domain: "nordicfemalefounders.dk"
+    max_items: 50
+    href_include: "/presse/"
+
