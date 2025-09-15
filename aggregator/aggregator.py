@@ -141,8 +141,7 @@ def scrape_press_page(
     max_items: int = 30,
     href_include: str | None = None,
     href_exclude: str | None = None,
-    allow_pdf: bool = False,
-) -> list[dict]:
+    allow_pdf: bool = False,) -> list[dict]:
     """Henter en presseside (HTML), finder links på samme domæne og returnerer som entries.
        Rækkefølge bevares; vi tildeler kunstige timestamps (nu, nu-1min, ...)."""
     out: list[dict] = []
